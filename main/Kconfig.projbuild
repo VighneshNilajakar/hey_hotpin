@@ -1,0 +1,72 @@
+menu "Wake word detector"
+
+config WAKE_WORD_THRESHOLD_PCT
+    int "Wake word confidence threshold (%)"
+    range 0 100
+    default 95
+    help
+        Fire only when the hey_hotpin class score reaches this percentage.
+        Measured on the bench: real phrases land at 0.92-0.996, ordinary
+        speech peaks near 0.50, and a quiet room stays under 0.05. 95 keeps
+        every real detection while leaving a wide false-accept margin.
+
+config WAKE_WORD_SELFTEST
+    bool "Run inference self test at boot"
+    default y
+    help
+        Runs a few inferences on a synthetic window at startup and logs the
+        MFCC and neural network timing. Validates the deployment without a
+        microphone attached.
+
+endmenu
+
+menu "INMP441 microphone"
+
+config MIC_BCLK_GPIO
+    int "I2S bit clock GPIO"
+    range 0 39
+    default 14
+    help
+        WARNING: GPIO2/4/12/13/14/15 are the SPI flash bus on an ESP32-CAM.
+        Using them makes the I2S peripheral and the flash controller drive the
+        same pads. This build deliberately uses 14/15/13 to test the user's
+        existing wiring; expect instability if flash is also accessed.
+
+config MIC_WS_GPIO
+    int "I2S word select GPIO"
+    range 0 39
+    default 15
+
+config MIC_DIN_GPIO
+    int "I2S data-in GPIO"
+    range 0 39
+    default 13
+
+config MIC_GAIN_SHIFT
+    int "Microphone right-shift (lower = louder)"
+    range 0 20
+    default 11
+    help
+        The INMP441's 24-bit payload sits in bits 31..8 of the 32-bit I2S slot.
+        14 was far too quiet - the detector only fired at arm's length. 10 added
+        about 24 dB but saturated at 32768. 11 is the current setting. Watch the
+        "audio peak" figure in the PEAK log line: keep speech peaks near
+        8000-25000, raise the number if it pins at 32768, lower it if it stays
+        under 3000.
+
+config STATUS_LED_GPIO
+    int "Status LED GPIO (-1 to disable)"
+    range -1 39
+    default 4
+    help
+        GPIO4 drives the AI-Thinker ESP32-CAM on-board LED (active low). It is
+        also SPI flash SD1, which is only driven in QIO mode. This build runs
+        the flash in DIO, so the pin is free at runtime - do not switch back to
+        QIO while this LED is enabled.
+
+config STATUS_LED_ON_MS
+    int "Status LED on time after a trigger (ms)"
+    range 50 5000
+    default 250
+
+endmenu

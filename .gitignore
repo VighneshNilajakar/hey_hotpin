@@ -1,0 +1,29 @@
+# ESP-IDF build output
+build/
+build-*/
+sdkconfig
+sdkconfig.old
+*.bin
+*.elf
+*.map
+*.log
+
+# Local captures and serial logs
+monitor_log.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# NOTE: edge-impulse-sdk/, model-parameters/ and tflite-model/ are the
+# vendored Edge Impulse deployment and ARE committed on purpose - the project
+# will not build without them. Regenerate them from
+# https://studio.edgeimpulse.com/studio/1127922
+# Deployment -> C++ library -> Build.

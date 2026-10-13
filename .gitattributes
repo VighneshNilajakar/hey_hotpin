@@ -1,0 +1,12 @@
+# Normalise text to LF in the repository, keep it as-is in the working tree.
+* text=auto eol=lf
+
+# Generated / vendored assets that must never be touched
+*.bin        -text
+*.jpg        -text
+*.png        -text
+LICENSE      -text
+LICENSE.*    -text
+
+# Windows batch files need CRLF
+*.bat        text eol=crlf

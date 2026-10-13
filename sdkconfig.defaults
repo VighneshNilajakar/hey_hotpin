@@ -1,0 +1,51 @@
+# Target
+CONFIG_IDF_TARGET="esp32"
+
+# Flash size (AI-Thinker ESP32-CAM uses a 4 MB SPI flash)
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+# DIO, not QIO: the mic is currently wired onto GPIO14/15/13, which are
+# SD_CLK/SD_CMD/SD_DATA3. Fewer flash lines in play is strictly safer.
+CONFIG_ESPTOOLPY_FLASHMODE_DIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_40M=y
+
+# Partition table
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# CPU pinned at 160 MHz
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160=y
+
+# Brownout detector must stay on
+CONFIG_ESP_BROWNOUT_DET=y
+CONFIG_ESP_BROWNOUT_DET_LVL_SEL_7=y
+
+# PSRAM off: the wake-word model needs ~6 KB of arena, and GPIO16 stays free
+# for the I2S mic clock. Turn this on (and move MIC_I2S_BCLK off GPIO16)
+# if you later need PSRAM for camera streaming.
+CONFIG_SPIRAM=n
+
+# Networking is unused by the wake-word test firmware.
+CONFIG_ESP_WIFI_ENABLED=n
+CONFIG_ESP_BLUEDROID_ENABLED=n
+CONFIG_NVS_ENABLED=y
+
+# Smaller builds / faster inference
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS=y
+CONFIG_FREERTOS_HZ=1000
+
+# Give the main task room for the Edge Impulse DSP
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# Watchdog: inference must not trip this
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=10
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0=n
+
+# Logging
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+CONFIG_LOG_MAXIMUM_LEVEL_DEBUG=y
+
+# Wake-word self test (see main/wake_word.c)
+CONFIG_WAKE_WORD_SELFTEST=y
