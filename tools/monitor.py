@@ -17,16 +17,17 @@ def main():
     args = ap.parse_args()
 
     s = serial.Serial(args.port, args.baud, timeout=0.2)
-    # Keep the FTDI modem-control lines idle so opening the port does not
-    # reset the board. DTR is IO0, RTS is EN on an ESP32-CAM-MB.
-    s.dtr = False
-    s.rts = False
+    # DTR -> IO0 and RTS -> EN. Idling them LOW holds IO0 in download mode and
+    # EN in reset, which produces the endless ROM "waiting for download" loop.
+    s.dtr = True
+    s.rts = True
     time.sleep(0.2)
 
     if args.reset:
-        s.rts = True
-        time.sleep(0.1)
         s.rts = False
+        time.sleep(0.1)
+        s.rts = True
+        time.sleep(0.2)
 
     with open(args.out, "wb") as f:
         f.write(b"--- capture start ---\n")
